@@ -68,7 +68,7 @@ with col1:
 
 # -----------------------
 # Column 2: Add detected items to cart (styled)
-# -----------------------
+
 with col2:
     st.subheader("🛒 Add Detected Items")
 
