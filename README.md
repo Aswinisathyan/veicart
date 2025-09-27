@@ -30,3 +30,14 @@ Veicart is an intelligent checkout system designed for groceries, specifically f
 - Reduces human error in billing.
 - Can be deployed in grocery stores, supermarkets, or farmers' markets.
 
+## Relevant Topics
+
+- Python
+- Streamlit
+- YOLOv8
+- Machine Learning
+- Computer Vision
+- Deep Learning
+- Object Detection
+- Retail Automation
+- IoT
