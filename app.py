@@ -34,7 +34,7 @@ if "detected_items" not in st.session_state:
 # Page layout
 # -----------------------
 st.set_page_config(page_title="🍎 VEICART - Smart Market Checkout", layout="wide")
-st.markdown("<h1 style='text-align:center; color:green;'>🍏 VEICART - Smart Fruits & Veggies Checkout</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align:center;'>🍏 VEICART - Smart Fruits & Veggies Checkout</h1>", unsafe_allow_html=True)
 
 # -----------------------
 # Layout: three columns
@@ -57,18 +57,27 @@ with col1:
         st.image(annotated_frame, channels="BGR")
 
         if len(results[0].boxes) > 0:
-            detected = [results[0].names[int(box.cls)] for box in results[0].boxes]
-            # Keep only **unique items**
-            valid_items = list(set([item for item in detected if item in database_items]))
-            st.session_state.detected_items = valid_items
-            if valid_items:
-                st.success(f"Detected Items: {', '.join(valid_items)}")
+            detected_items = []
+            for box in results[0].boxes:
+                cls = int(box.cls)        # class index
+                conf = float(box.conf)    # confidence score
+                label = results[0].names[cls]
+
+                # ✅ Only keep if confidence ≥ 40% and in database
+                if conf >= 0.40 and label in database_items:
+                    detected_items.append(label)
+
+            # Keep only unique items
+            st.session_state.detected_items = list(set(detected_items))
+
+            if st.session_state.detected_items:
+                st.success(f"Detected Items: {', '.join(st.session_state.detected_items)}")
             else:
                 st.warning("No valid items detected in the database.")
 
 # -----------------------
-# Column 2: Add detected items to cart (styled)
-
+# Column 2: Add detected items to cart
+# -----------------------
 with col2:
     st.subheader("🛒 Add Detected Items")
 
@@ -79,12 +88,11 @@ with col2:
 
                 # Column 1: Item name and price
                 with col_item:
-                    st.markdown(f"### 🥬 {item}")
+                    st.markdown(f"**{item}**")
                     st.markdown(f"**Price:** ₹{database_items[item]}/kg")
 
                 # Column 2: Weight input
                 with col_input:
-                    # If item is already in cart, prefill the weight
                     existing = next((c for c in st.session_state.cart if c["item"] == item), None)
                     initial_weight = existing["weight"] if existing else 0.01
                     weight = st.number_input(
